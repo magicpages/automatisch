@@ -6,27 +6,28 @@ services:
       dockerfile: Dockerfile.compose
     entrypoint: /compose-entrypoint.sh
     ports:
-      - '3000:3000'
+      - '1234:3000'
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_started
     environment:
-      - HOST=localhost
-      - PROTOCOL=http
-      - PORT=3000
-      - APP_ENV=production
-      - REDIS_HOST=redis
-      - POSTGRES_HOST=postgres
-      - POSTGRES_DATABASE=automatisch
-      - POSTGRES_USERNAME=automatisch_user
-      - POSTGRES_PASSWORD=automatisch_password
-      - ENCRYPTION_KEY
-      - WEBHOOK_SECRET_KEY
-      - APP_SECRET_KEY
+      - HOST=${HOST}
+      - PROTOCOL=${PROTOCOL}
+      - PORT=${PORT}
+      - APP_ENV=${APP_ENV}
+      - REDIS_HOST=${REDIS_HOST}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - WEBHOOK_SECRET_KEY=${WEBHOOK_SECRET_KEY}
+      - APP_SECRET_KEY=${APP_SECRET_KEY}
     volumes:
       - automatisch_storage:/automatisch/storage
+
   worker:
     build:
       context: ./docker
@@ -35,24 +36,25 @@ services:
     depends_on:
       - main
     environment:
-      - APP_ENV=production
-      - REDIS_HOST=redis
-      - POSTGRES_HOST=postgres
-      - POSTGRES_DATABASE=automatisch
-      - POSTGRES_USERNAME=automatisch_user
-      - POSTGRES_PASSWORD=automatisch_password
-      - ENCRYPTION_KEY
-      - WEBHOOK_SECRET_KEY
-      - APP_SECRET_KEY
+      - APP_ENV=${APP_ENV}
+      - REDIS_HOST=${REDIS_HOST}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - WEBHOOK_SECRET_KEY=${WEBHOOK_SECRET_KEY}
+      - APP_SECRET_KEY=${APP_SECRET_KEY}
       - WORKER=true
     volumes:
       - automatisch_storage:/automatisch/storage
+
   postgres:
     image: 'postgres:14.5'
     environment:
-      - POSTGRES_DB=automatisch
-      - POSTGRES_USER=automatisch_user
-      - POSTGRES_PASSWORD=automatisch_password
+      - POSTGRES_DB=${POSTGRES_DATABASE}
+      - POSTGRES_USER=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -60,10 +62,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
   redis:
     image: 'redis:7.0.4'
     volumes:
       - redis_data:/data
+
 volumes:
   automatisch_storage:
   postgres_data:
